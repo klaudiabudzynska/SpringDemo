@@ -12,7 +12,7 @@ import java.util.Map;
 
 @Controller
 public class UserController {
-    Map<Long, UserEntity> users = new HashMap<Long, UserEntity>();
+    private Map<Long, UserEntity> users = new HashMap<Long, UserEntity>();
 
     @RequestMapping("/users")
     @ResponseBody
