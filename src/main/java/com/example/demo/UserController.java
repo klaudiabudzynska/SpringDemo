@@ -6,44 +6,48 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.ArrayList;
 import java.sql.Timestamp;
-import java.util.Date;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 @Controller
 public class UserController {
+    Map<Long, UserEntity> users = new HashMap<Long, UserEntity>();
 
     @RequestMapping("/users")
     @ResponseBody
-    public Object getUsers(
-            @RequestParam Integer pageNumber,
-            @RequestParam Integer pageSize
-    ) {
-        List<UserEntity> users = new ArrayList<>();
-
-        users.add(new UserEntity(1L, "John"));
-        users.add(new UserEntity(2L, "Matt"));
-        users.add(new UserEntity(3L, "Chris"));
-
+    public Object getUsers() {
         return users;
     }
 
-    @RequestMapping("/users/{id}")
+    @RequestMapping("/users/{id}/get")
     @ResponseBody
-    public Object getUsers(
+    public Object getUser(
             @PathVariable Long id
     ) {
-        return new UserEntity(id, "John-" + id);
+        return users.get(id);
+    }
+
+    @RequestMapping("/users/{id}/remove")
+    @ResponseBody
+    public Object removeUser(
+            @PathVariable Long id
+    ) {
+        UserEntity userToRemove = users.get(id);
+        users.remove(id);
+        return userToRemove;
     }
 
     @RequestMapping("/users/add")
     @ResponseBody
     public Object addUser(
             @RequestParam String name,
-            @RequestParam Integer age
+            @RequestParam Short age
     ) {
-        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        return new UserEntity(timestamp.getTime(), name, age);
+        UserEntity newUser = new UserEntity(name, age);
+        long timestamp = new Timestamp(System.currentTimeMillis()).getTime();
+        users.putIfAbsent(timestamp, newUser);
+
+        return newUser;
     }
 }
