@@ -20,6 +20,15 @@ public class UserController {
         return users;
     }
 
+    @RequestMapping("/users")
+    @ResponseBody
+    public Object getUsersWithPagination(
+            @RequestParam(name="page-number", required = false) Integer pageNumber,
+            @RequestParam(name="page-size", required = false) Integer pageSize
+    ) {
+        return users;
+    }
+
     @RequestMapping("/users/{id}/get")
     @ResponseBody
     public Object getUser(
