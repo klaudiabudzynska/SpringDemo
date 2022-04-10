@@ -8,6 +8,6 @@ public class ExampleController {
 
     @RequestMapping("/example")
     public String example() {
-        return "site";
+        return "users";
     }
 }
