@@ -1,35 +1,45 @@
 package com.example.demo;
 
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.*;
 
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 
-@Controller
+@RestController
 public class UserController {
     private Map<Long, UserEntity> users = new HashMap<Long, UserEntity>();
 
-    @RequestMapping("/users")
-    @ResponseBody
-    public Object getUsers() {
-        return users;
+
+    private UserController() {
+        for (int i = 0; i < 40; i++) {
+            this.users.put((long) i, new UserEntity("sd", (short) 3));
+        }
     }
 
-    @RequestMapping("/users")
+    @RequestMapping("/api/users")
     @ResponseBody
     public Object getUsersWithPagination(
-            @RequestParam(name="page-number", required = false) Integer pageNumber,
-            @RequestParam(name="page-size", required = false) Integer pageSize
+            @RequestParam(name="page-number", defaultValue = "1") Integer pageNumber,
+            @RequestParam(name="page-size", defaultValue = "20") Integer pageSize
     ) {
-        return users;
+        //TODO: dodać walidację
+
+        //TODO: paginacja
+
+        UserPage page = new UserPage();
+
+        page.setPageNumber(pageNumber);
+        page.setPagesCount(1); //TODO
+        page.setPageSize(pageSize);
+        page.setTotalCount(1); //TODO
+        page.setUsers(this.users.values());
+
+        return page;
     }
 
-    @RequestMapping("/users/{id}/get")
+    @RequestMapping("/api/users/{id}/get")
     @ResponseBody
     public Object getUser(
             @PathVariable Long id
@@ -37,7 +47,7 @@ public class UserController {
         return users.get(id);
     }
 
-    @RequestMapping("/users/{id}/remove")
+    @RequestMapping("/api/users/{id}/remove")
     @ResponseBody
     public Object removeUser(
             @PathVariable Long id
@@ -47,16 +57,14 @@ public class UserController {
         return userToRemove;
     }
 
-    @RequestMapping("/users/add")
+    @PostMapping(
+            value = "/api/user/create",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
     @ResponseBody
-    public Object addUser(
-            @RequestParam String name,
-            @RequestParam Short age
-    ) {
-        UserEntity newUser = new UserEntity(name, age);
-        long timestamp = new Timestamp(System.currentTimeMillis()).getTime();
-        users.putIfAbsent(timestamp, newUser);
-
-        return newUser;
+    public UserEntity createUser(@RequestBody UserEntity user) {
+        //TODO: odwołanie do serwisu
+        return user;
     }
 }
